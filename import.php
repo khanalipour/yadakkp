@@ -137,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['import_file'])) {
                         $desc = trim($row[8] ?? '');
                     }
 
-                    if (empty($name) || $name === 'نام کالا' || $name === 'شناسه') continue;
+                    if (empty($name) || $name === 'نام کالا' || $name === 'شناسه' || $name === 'ردیف') continue;
 
                     $catId = $getOrCreateCategory($catName);
                     $brandId = $getOrCreateBrand($brandName);
@@ -148,8 +148,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['import_file'])) {
             }
             fclose($handle);
         }
+    } elseif ($ext === 'xls') {
+        $html = file_get_contents($file['tmp_name']);
+        if (preg_match_all('/<tr[^>]*>(.*?)<\/tr>/si', $html, $trMatches)) {
+            foreach ($trMatches[1] as $tr) {
+                if (preg_match_all('/<td[^>]*>(.*?)<\/td>/si', $tr, $tdMatches)) {
+                    $cols = array_map(function($val) {
+                        return trim(html_entity_decode(strip_tags($val), ENT_QUOTES, 'UTF-8'));
+                    }, $tdMatches[1]);
+
+                    if (count($cols) >= 5) {
+                        $firstCol = $cols[0];
+                        if (is_numeric($firstCol)) {
+                            // ستون اول شماره ردیف است
+                            $name = $cols[1] ?? '';
+                            $code = $cols[2] ?? '';
+                            $catName = $cols[3] ?? '';
+                            $brandName = $cols[4] ?? '';
+                            $buyPrice = (int)str_replace(',', '', $cols[5] ?? '0');
+                            $sellPrice = (int)str_replace(',', '', $cols[6] ?? '0');
+                            $stock = (int)($cols[7] ?? 0);
+                            $minStock = (int)($cols[8] ?? 5);
+                            $desc = $cols[9] ?? '';
+                        } else {
+                            $name = $cols[0];
+                            if ($name === 'نام کالا' || $name === 'ردیف' || strpos($name, 'فروشگاه') !== false) continue;
+                            $code = $cols[1] ?? '';
+                            $catName = $cols[2] ?? '';
+                            $brandName = $cols[3] ?? '';
+                            $buyPrice = (int)str_replace(',', '', $cols[4] ?? '0');
+                            $sellPrice = (int)str_replace(',', '', $cols[5] ?? '0');
+                            $stock = (int)($cols[6] ?? 0);
+                            $minStock = (int)($cols[7] ?? 5);
+                            $desc = $cols[8] ?? '';
+                        }
+
+                        if (empty($name)) continue;
+
+                        $catId = $getOrCreateCategory($catName);
+                        $brandId = $getOrCreateBrand($brandName);
+
+                        $insertProdStmt->execute([$name, $code, $catId, $brandId, $buyPrice, $sellPrice, $stock, $minStock, $desc]);
+                        $importedCount++;
+                    }
+                }
+            }
+        }
     } else {
-        setFlash('danger', 'پسوند فایل مجاز نیست. لطفاً فایل CSV یا JSON انتخاب کنید.');
+        setFlash('danger', 'پسوند فایل مجاز نیست. لطفاً فایل اکسل (.xls / .csv) یا .json انتخاب فرمایید.');
         header('Location: products.php');
         exit;
     }

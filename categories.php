@@ -186,13 +186,18 @@ require_once __DIR__ . '/includes/header.php';
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                             <li>
-                                <a class="dropdown-item py-2" href="export.php?format=csv&category_id=<?= $activeCategory['id'] ?>">
-                                    <i class="bi bi-file-earmark-excel text-success me-2"></i>فایل اکسل (CSV) این دسته
+                                <a class="dropdown-item py-2" href="export.php?format=excel&category_id=<?= $activeCategory['id'] ?>">
+                                    <i class="bi bi-file-earmark-excel text-success me-2"></i>فایل حرفه‌ای اکسل (.xls)
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item py-2" href="export.php?format=json&category_id=<?= $activeCategory['id'] ?>">
                                     <i class="bi bi-filetype-json text-primary me-2"></i>فایل JSON این دسته
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 text-secondary" href="export.php?format=csv&category_id=<?= $activeCategory['id'] ?>">
+                                    <i class="bi bi-filetype-csv me-2"></i>فایل CSV این دسته
                                 </a>
                             </li>
                         </ul>

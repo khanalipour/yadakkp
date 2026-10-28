@@ -134,8 +134,8 @@ require_once __DIR__ . '/includes/header.php';
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                 <li>
-                    <a class="dropdown-item py-2" href="export.php?format=csv&category_id=<?= $categoryId ?>">
-                        <i class="bi bi-file-earmark-excel text-success me-2"></i>دانلود فایل اکسل (CSV)
+                    <a class="dropdown-item py-2" href="export.php?format=excel&category_id=<?= $categoryId ?>">
+                        <i class="bi bi-file-earmark-excel text-success me-2"></i>دانلود فایل حرفه‌ای اکسل (.xls)
                     </a>
                 </li>
                 <li>
@@ -143,9 +143,14 @@ require_once __DIR__ . '/includes/header.php';
                         <i class="bi bi-filetype-json text-primary me-2"></i>دانلود ساختار JSON
                     </a>
                 </li>
+                <li>
+                    <a class="dropdown-item py-2 text-secondary" href="export.php?format=csv&category_id=<?= $categoryId ?>">
+                        <i class="bi bi-filetype-csv me-2"></i>دانلود فایل متنی CSV
+                    </a>
+                </li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
-                    <a class="dropdown-item py-2 text-muted small" href="export.php?template=1&format=csv">
+                    <a class="dropdown-item py-2 text-muted small" href="export.php?template=1&format=excel">
                         <i class="bi bi-cloud-arrow-down me-2"></i>دانلود قالب خام اکسل
                     </a>
                 </li>
@@ -390,20 +395,20 @@ require_once __DIR__ . '/includes/header.php';
                 <div class="modal-body p-4">
                     <div class="alert alert-info py-2 small mb-3">
                         <i class="bi bi-info-circle me-1"></i>
-                        می‌توانید فایل‌های خروجی گرفته شده با فرمت <strong>CSV (اکسل)</strong> یا <strong>JSON</strong> را در اینجا بارگذاری نمایید.
+                        می‌توانید فایل‌های خروجی با فرمت <strong>اکسل (.xls یا .csv)</strong> یا <strong>JSON</strong> را در اینجا بارگذاری نمایید.
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">انتخاب فایل اکسل (CSV) یا JSON <span class="text-danger">*</span></label>
-                        <input type="file" name="import_file" class="form-control" accept=".csv, .json" required>
+                        <label class="form-label fw-semibold">انتخاب فایل اکسل (.xls / .csv) یا JSON <span class="text-danger">*</span></label>
+                        <input type="file" name="import_file" class="form-control" accept=".xls, .csv, .json" required>
                     </div>
 
                     <div class="p-3 bg-light rounded-3 small">
                         <div class="fw-bold mb-1 text-dark">نیاز به راهنمایی دارید؟</div>
                         <div class="text-muted mb-2">جهت پر کردن صحیح ستون‌ها، فایل نمونه را دانلود کرده و مقادیر را مطابق آن تکمیل کنید:</div>
                         <div class="d-flex gap-2">
-                            <a href="export.php?template=1&format=csv" class="btn btn-outline-success btn-sm">
-                                <i class="bi bi-download me-1"></i> دریافت نمونه اکسل
+                            <a href="export.php?template=1&format=excel" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-download me-1"></i> دریافت نمونه اکسل (.xls)
                             </a>
                             <a href="export.php?template=1&format=json" class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-download me-1"></i> دریافت نمونه JSON
