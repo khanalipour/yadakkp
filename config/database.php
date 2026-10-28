@@ -18,6 +18,7 @@ function getDB() {
     }
 
     // تلاش برای اتصال به MySQL
+    $mysqlError = '';
     try {
         $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
         $pdo = new PDO($dsn, DB_USER, DB_PASS, [
@@ -27,7 +28,9 @@ function getDB() {
         ]);
         $dbDriver = 'mysql';
     } catch (PDOException $e) {
-        // اگر دیتابیس وجود نداشت، سعی می‌کنیم بسازیمش
+        $mysqlError = $e->getMessage();
+
+        // اگر دیتابیس وجود نداشت، سعی می‌کنیم بسازیمش (برای محیط لوکال)
         if (strpos($e->getMessage(), 'Unknown database') !== false) {
             try {
                 $rootDsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";charset=" . DB_CHARSET;
@@ -45,21 +48,41 @@ function getDB() {
             }
         }
 
-        // اگر اتصال به MySQL به هر دلیلی در سیستم محلی ناموفق بود و فال‌بک مجاز است
+        // اگر اتصال به MySQL ناموفق بود
         if ($pdo === null) {
-            if (defined('DB_ALLOW_SQLITE_FALLBACK') && DB_ALLOW_SQLITE_FALLBACK) {
-                $dir = dirname(SQLITE_FILE_PATH);
-                if (!is_dir($dir)) {
-                    mkdir($dir, 0777, true);
+            // تنها در صورتی از SQLite استفاده کن که اکستنشن pdo_sqlite روی سرور نصب و فعال باشد
+            if (defined('DB_ALLOW_SQLITE_FALLBACK') && DB_ALLOW_SQLITE_FALLBACK && extension_loaded('pdo_sqlite')) {
+                try {
+                    $dir = dirname(SQLITE_FILE_PATH);
+                    if (!is_dir($dir)) {
+                        @mkdir($dir, 0777, true);
+                    }
+                    $pdo = new PDO("sqlite:" . SQLITE_FILE_PATH, null, null, [
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    ]);
+                    $dbDriver = 'sqlite';
+                    $dbNotice = 'در حال حاضر از پایگاه داده محلی موقت (SQLite) استفاده می‌شود. برای اتصال به MySQL، تنظیمات config/config.php را بررسی فرمایید.';
+                } catch (Exception $sqle) {
+                    $pdo = null;
                 }
-                $pdo = new PDO("sqlite:" . SQLITE_FILE_PATH, null, null, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                ]);
-                $dbDriver = 'sqlite';
-                $dbNotice = 'در حال حاضر از پایگاه داده محلی موقت (SQLite) استفاده می‌شود. برای انتقال به هاست/ساب‌دامین، اطلاعات MySQL در config.php را تکمیل فرمایید.';
-            } else {
-                die("خطا در اتصال به پایگاه داده MySQL: " . htmlspecialchars($e->getMessage()));
+            }
+            
+            if ($pdo === null) {
+                die("
+                <div style='direction:rtl;text-align:right;font-family:tahoma,sans-serif;max-width:650px;margin:50px auto;padding:25px;background:#fff1f2;border:1px solid #fecdd3;border-radius:14px;color:#9f1239;box-shadow:0 10px 25px rgba(0,0,0,0.06);line-height:1.8;'>
+                    <h3 style='margin-top:0;color:#e11d48;'>⚠️ خطا در اتصال به پایگاه داده MySQL هاست</h3>
+                    <p>سیستم نتوانست با مشخصات فعلی به دیتابیس متصل شود. علت خطا:</p>
+                    <div style='background:#fff;padding:12px;border-radius:8px;border:1px solid #fda4af;font-family:monospace;direction:ltr;text-align:left;color:#be123c;margin-bottom:15px;word-break:break-all;'>
+                        " . htmlspecialchars($mysqlError) . "
+                    </div>
+                    <h4 style='margin-bottom:8px;color:#9f1239;'>چگونه مشکل را حل کنید؟</h4>
+                    <ol style='padding-right:20px;margin-bottom:0;'>
+                        <li>وارد فایل <code>config/config.php</code> در هاست شوید.</li>
+                        <li>مقادیر <code>DB_NAME</code>، <code>DB_USER</code> و <code>DB_PASS</code> را دقیقاً طبق دیتابیسی که در کنترل‌پنل هاست (cPanel یا DirectAdmin) ساختید وارد کنید.</li>
+                        <li><b>دقت فرمایید:</b> در هاست‌های اشتراکی، نام دیتابیس و نام کاربر دارای پیشوند نام کاربری هاست هستند (مثلاً: <code>yadakkpi_anbar</code>).</li>
+                    </ol>
+                </div>");
             }
         }
     }
