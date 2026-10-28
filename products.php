@@ -287,97 +287,98 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 </div>
 
-<!-- جدول محصولات -->
-<div class="card shadow-sm border-0">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+<!-- جدول حرفه‌ای محصولات -->
+<div class="table-container mb-4">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>نام قطعه و شناسه</th>
+                    <th>دسته‌بندی</th>
+                    <th>برند سازنده</th>
+                    <th>قیمت خرید</th>
+                    <th>قیمت فروش</th>
+                    <th>موجودی</th>
+                    <th class="text-center" style="width: 110px;">عملیات</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($products)): ?>
                     <tr>
-                        <th style="width: 50px;">#</th>
-                        <th>نام قطعه و شناسه</th>
-                        <th>دسته‌بندی</th>
-                        <th>برند سازنده</th>
-                        <th>قیمت خرید</th>
-                        <th>قیمت فروش</th>
-                        <th>موجودی</th>
-                        <th class="text-center" style="width: 140px;">عملیات</th>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-search fs-1 text-secondary opacity-50 d-block mb-2"></i>
+                            هیچ کالایی مطابق با فیلترهای انتخابی یافت نشد.
+                            <div class="mt-2">
+                                <a href="products.php" class="btn btn-sm btn-outline-primary">نمایش همه کالاها</a>
+                            </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($products)): ?>
+                <?php else: ?>
+                    <?php $idx = 1; foreach ($products as $p): ?>
                         <tr>
-                            <td colspan="8" class="text-center py-5 text-muted">
-                                <i class="bi bi-search fs-1 text-secondary opacity-50 d-block mb-2"></i>
-                                هیچ کالایی مطابق با فیلترهای انتخابی یافت نشد.
-                                <div class="mt-2">
-                                    <a href="products.php" class="btn btn-sm btn-outline-primary">نمایش همه کالاها</a>
+                            <td class="text-muted fw-bold"><?= tr_num($idx++) ?></td>
+                            <td>
+                                <div class="fw-bold fs-6"><?= htmlspecialchars($p['name']) ?></div>
+                                <?php if (!empty($p['code'])): ?>
+                                    <span class="badge bg-light text-secondary border font-monospace mt-1">کد: <?= htmlspecialchars($p['code']) ?></span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if (!empty($p['category_name'])): ?>
+                                    <a href="categories.php?cat_id=<?= $p['category_id'] ?>" class="text-decoration-none">
+                                        <span class="badge rounded-pill text-white px-2 py-1" style="background-color: <?= htmlspecialchars($p['category_color'] ?: '#0284c7') ?>;">
+                                            <i class="bi bi-folder-fill me-1"></i><?= htmlspecialchars($p['category_name']) ?>
+                                        </span>
+                                    </a>
+                                <?php else: ?>
+                                    <span class="text-muted small">بدون دسته</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary-subtle text-body border px-2 py-1">
+                                    <?= htmlspecialchars($p['brand_name'] ?: 'نامشخص') ?>
+                                </span>
+                            </td>
+                            <td class="price-buy">
+                                <?= formatToman($p['purchase_price']) ?>
+                            </td>
+                            <td class="price-sell fw-bold">
+                                <?= formatToman($p['sell_price']) ?>
+                            </td>
+                            <td>
+                                <?php if ($p['stock'] <= 0): ?>
+                                    <span class="stock-pill stock-pill-empty">
+                                        <span class="stock-dot"></span>
+                                        ناموجود (۰)
+                                    </span>
+                                <?php elseif ($p['stock'] <= $p['min_stock']): ?>
+                                    <span class="stock-pill stock-pill-low">
+                                        <span class="stock-dot"></span>
+                                        <?= tr_num($p['stock']) ?> عدد (کمبود)
+                                    </span>
+                                <?php else: ?>
+                                    <span class="stock-pill stock-pill-high">
+                                        <span class="stock-dot"></span>
+                                        <?= tr_num($p['stock']) ?> عدد
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-inline-flex gap-1">
+                                    <a href="product-edit.php?id=<?= $p['id'] ?>" class="table-action-btn table-action-edit" title="ویرایش و افزایش قیمت">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <button type="button" class="table-action-btn table-action-delete" onclick="confirmDeleteProduct(<?= $p['id'] ?>, '<?= htmlspecialchars(addslashes($p['name'])) ?>')" title="انتقال به سطل زباله">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
-                    <?php else: ?>
-                        <?php $idx = 1; foreach ($products as $p): ?>
-                            <tr>
-                                <td class="text-muted fw-bold"><?= tr_num($idx++) ?></td>
-                                <td>
-                                    <div class="fw-bold text-dark fs-6"><?= htmlspecialchars($p['name']) ?></div>
-                                    <?php if (!empty($p['code'])): ?>
-                                        <span class="badge bg-light text-secondary border font-monospace mt-1">کد: <?= htmlspecialchars($p['code']) ?></span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <?php if (!empty($p['category_name'])): ?>
-                                        <a href="categories.php?cat_id=<?= $p['category_id'] ?>" class="text-decoration-none">
-                                            <span class="badge rounded-pill text-white px-2 py-1" style="background-color: <?= htmlspecialchars($p['category_color'] ?: '#0284c7') ?>;">
-                                                <i class="bi bi-folder-fill me-1"></i><?= htmlspecialchars($p['category_name']) ?>
-                                            </span>
-                                        </a>
-                                    <?php else: ?>
-                                        <span class="text-muted small">بدون دسته</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <span class="badge bg-secondary-subtle text-dark border px-2 py-1">
-                                        <?= htmlspecialchars($p['brand_name'] ?: 'نامشخص') ?>
-                                    </span>
-                                </td>
-                                <td class="price-buy">
-                                    <?= formatToman($p['purchase_price']) ?>
-                                </td>
-                                <td class="price-sell fw-bold">
-                                    <?= formatToman($p['sell_price']) ?>
-                                </td>
-                                <td>
-                                    <?php if ($p['stock'] <= 0): ?>
-                                        <span class="badge stock-badge-empty rounded-pill px-3 py-1">
-                                            <i class="bi bi-x-circle me-1"></i>ناموجود (۰)
-                                        </span>
-                                    <?php elseif ($p['stock'] <= $p['min_stock']): ?>
-                                        <span class="badge stock-badge-medium rounded-pill px-3 py-1">
-                                            <i class="bi bi-exclamation-triangle me-1"></i><?= tr_num($p['stock']) ?> عدد (کمبود)
-                                        </span>
-                                    <?php else: ?>
-                                        <span class="badge stock-badge-high rounded-pill px-3 py-1">
-                                            <i class="bi bi-check2 me-1"></i><?= tr_num($p['stock']) ?> عدد
-                                        </span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="text-center">
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="product-edit.php?id=<?= $p['id'] ?>" class="btn btn-outline-primary" title="ویرایش و افزایش قیمت">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                        <button type="button" class="btn btn-outline-danger" onclick="confirmDeleteProduct(<?= $p['id'] ?>, '<?= htmlspecialchars(addslashes($p['name'])) ?>')" title="انتقال به سطل زباله">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
     </div>
 </div>
 

@@ -12,10 +12,10 @@
     </div>
 </footer>
 
-<!-- Bootstrap Bundle JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- SweetAlert2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<!-- Bootstrap Bundle JS (Local) -->
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- SweetAlert2 JS (Local) -->
+<script src="assets/vendor/sweetalert2/sweetalert2.all.min.js"></script>
 <!-- Custom App JS -->
 <script src="assets/js/app.js?v=<?= time() ?>"></script>
 

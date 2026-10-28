@@ -43,71 +43,69 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 </div>
 
-<div class="card shadow-sm border-0">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+<div class="table-container mb-4">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th style="width: 60px;">ردیف</th>
+                    <th>نام کالا و شناسه</th>
+                    <th>دسته‌بندی</th>
+                    <th>برند</th>
+                    <th>قیمت فروش</th>
+                    <th>زمان حذف</th>
+                    <th class="text-center" style="width: 170px;">عملیات</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($deletedProducts)): ?>
                     <tr>
-                        <th style="width: 60px;">ردیف</th>
-                        <th>نام کالا و شناسه</th>
-                        <th>دسته‌بندی</th>
-                        <th>برند</th>
-                        <th>قیمت فروش</th>
-                        <th>زمان حذف</th>
-                        <th class="text-center" style="width: 170px;">عملیات</th>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-trash fs-1 text-secondary opacity-50 d-block mb-2"></i>
+                            سطل زباله خالی است! هیچ کالایی حذف نشده است.
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($deletedProducts)): ?>
+                <?php else: ?>
+                    <?php $idx = 1; foreach ($deletedProducts as $p): ?>
                         <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">
-                                <i class="bi bi-trash fs-1 text-secondary opacity-50 d-block mb-2"></i>
-                                سطل زباله خالی است! هیچ کالایی حذف نشده است.
+                            <td class="text-muted fw-bold"><?= tr_num($idx++) ?></td>
+                            <td>
+                                <div class="fw-bold"><?= htmlspecialchars($p['name']) ?></div>
+                                <?php if (!empty($p['code'])): ?>
+                                    <span class="badge bg-light text-secondary border font-monospace mt-1"><?= htmlspecialchars($p['code']) ?></span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary border">
+                                    <?= htmlspecialchars($p['category_name'] ?: 'بدون دسته') ?>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary-subtle text-secondary border">
+                                    <?= htmlspecialchars($p['brand_name'] ?: 'بدون برند') ?>
+                                </span>
+                            </td>
+                            <td class="fw-bold">
+                                <?= formatToman($p['sell_price']) ?>
+                            </td>
+                            <td class="text-muted small">
+                                <?= toShamsiDate($p['deleted_at']) ?>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="product-delete.php?action=restore&id=<?= $p['id'] ?>" class="btn btn-outline-success" title="بازیابی به انبار">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i> بازیابی
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger" onclick="confirmPermanentDelete(<?= $p['id'] ?>, '<?= htmlspecialchars(addslashes($p['name'])) ?>')" title="حذف دائمی از دیتابیس">
+                                        <i class="bi bi-x-octagon me-1"></i> حذف کامل
+                                    </button>
+                                </div>
                             </td>
                         </tr>
-                    <?php else: ?>
-                        <?php $idx = 1; foreach ($deletedProducts as $p): ?>
-                            <tr>
-                                <td class="text-muted fw-bold"><?= tr_num($idx++) ?></td>
-                                <td>
-                                    <div class="fw-bold text-dark"><?= htmlspecialchars($p['name']) ?></div>
-                                    <?php if (!empty($p['code'])): ?>
-                                        <span class="badge bg-light text-secondary border font-monospace mt-1"><?= htmlspecialchars($p['code']) ?></span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <span class="badge bg-primary-subtle text-primary border">
-                                        <?= htmlspecialchars($p['category_name'] ?: 'بدون دسته') ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-secondary-subtle text-secondary border">
-                                        <?= htmlspecialchars($p['brand_name'] ?: 'بدون برند') ?>
-                                    </span>
-                                </td>
-                                <td class="fw-bold text-dark">
-                                    <?= formatToman($p['sell_price']) ?>
-                                </td>
-                                <td class="text-muted small">
-                                    <?= toShamsiDate($p['deleted_at']) ?>
-                                </td>
-                                <td class="text-center">
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="product-delete.php?action=restore&id=<?= $p['id'] ?>" class="btn btn-outline-success" title="بازیابی به انبار">
-                                            <i class="bi bi-arrow-counterclockwise me-1"></i> بازیابی
-                                        </a>
-                                        <button type="button" class="btn btn-outline-danger" onclick="confirmPermanentDelete(<?= $p['id'] ?>, '<?= htmlspecialchars(addslashes($p['name'])) ?>')" title="حذف دائمی از دیتابیس">
-                                            <i class="bi bi-x-octagon me-1"></i> حذف کامل
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
     </div>
 </div>
 

@@ -93,75 +93,73 @@ require_once __DIR__ . '/includes/header.php';
 <div class="row g-4">
     <!-- جدول برندها -->
     <div class="col-12">
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
+        <div class="table-container mb-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">ردیف</th>
+                            <th>نام برند / تولیدکننده</th>
+                            <th>کشور / مبدأ ساخت</th>
+                            <th>تعداد محصولات فعال</th>
+                            <th>تاریخ ثبت</th>
+                            <th class="text-center" style="width: 110px;">عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($brands)): ?>
                             <tr>
-                                <th style="width: 70px;">ردیف</th>
-                                <th>نام برند / تولیدکننده</th>
-                                <th>کشور / مبدأ ساخت</th>
-                                <th>تعداد محصولات فعال</th>
-                                <th>تاریخ ثبت</th>
-                                <th class="text-center" style="width: 140px;">عملیات</th>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    هیچ برندی تاکنون ثبت نشده است. از دکمه بالا برند جدید اضافه کنید.
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($brands)): ?>
+                        <?php else: ?>
+                            <?php $index = 1; foreach ($brands as $brand): ?>
                                 <tr>
-                                    <td colspan="6" class="text-center py-4 text-muted">
-                                        هیچ برندی تاکنون ثبت نشده است. از دکمه بالا برند جدید اضافه کنید.
+                                    <td class="text-muted fw-bold"><?= tr_num($index++) ?></td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-primary-subtle text-primary p-2 rounded-3">
+                                                <i class="bi bi-tag-fill"></i>
+                                            </span>
+                                            <span class="fw-bold fs-6"><?= htmlspecialchars($brand['name']) ?></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <?= !empty($brand['country']) ? htmlspecialchars($brand['country']) : '<span class="text-muted">-</span>' ?>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info-subtle text-info-emphasis rounded-pill px-3 py-1">
+                                            <?= tr_num($brand['product_count']) ?> کالا
+                                        </span>
+                                    </td>
+                                    <td class="text-muted small">
+                                        <?= toShamsiDate($brand['created_at'], false) ?>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-inline-flex gap-1">
+                                            <button type="button" class="table-action-btn table-action-edit" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#editBrandModal" 
+                                                data-id="<?= $brand['id'] ?>" 
+                                                data-name="<?= htmlspecialchars($brand['name']) ?>" 
+                                                data-country="<?= htmlspecialchars($brand['country'] ?? '') ?>"
+                                                title="ویرایش">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
+                                            <a href="brands.php?delete=<?= $brand['id'] ?>" 
+                                                class="table-action-btn table-action-delete" 
+                                                onclick="return confirm('آیا از حذف برند «<?= htmlspecialchars($brand['name']) ?>» مطمئن هستید؟');"
+                                                title="حذف">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
-                            <?php else: ?>
-                                <?php $index = 1; foreach ($brands as $brand): ?>
-                                    <tr>
-                                        <td class="text-muted fw-bold"><?= tr_num($index++) ?></td>
-                                        <td>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="badge bg-primary-subtle text-primary p-2 rounded-3">
-                                                    <i class="bi bi-tag-fill"></i>
-                                                </span>
-                                                <span class="fw-bold text-dark fs-6"><?= htmlspecialchars($brand['name']) ?></span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <?= !empty($brand['country']) ? htmlspecialchars($brand['country']) : '<span class="text-muted">-</span>' ?>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-info-subtle text-info-emphasis rounded-pill px-3 py-1">
-                                                <?= tr_num($brand['product_count']) ?> کالا
-                                            </span>
-                                        </td>
-                                        <td class="text-muted small">
-                                            <?= toShamsiDate($brand['created_at'], false) ?>
-                                        </td>
-                                        <td class="text-center">
-                                            <div class="btn-group btn-group-sm">
-                                                <button type="button" class="btn btn-outline-primary" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#editBrandModal" 
-                                                    data-id="<?= $brand['id'] ?>" 
-                                                    data-name="<?= htmlspecialchars($brand['name']) ?>" 
-                                                    data-country="<?= htmlspecialchars($brand['country'] ?? '') ?>"
-                                                    title="ویرایش">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                </button>
-                                                <a href="brands.php?delete=<?= $brand['id'] ?>" 
-                                                    class="btn btn-outline-danger" 
-                                                    onclick="return confirm('آیا از حذف برند «<?= htmlspecialchars($brand['name']) ?>» مطمئن هستید؟');"
-                                                    title="حذف">
-                                                    <i class="bi bi-trash"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

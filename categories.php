@@ -234,88 +234,92 @@ require_once __DIR__ . '/includes/header.php';
         </div>
 
         <!-- جدول محصولات این دسته -->
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-                <span class="fw-bold text-dark">
+        <div class="table-container mb-4">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                <span class="fw-bold">
                     <i class="bi bi-box-seam text-primary me-2"></i>لیست کالاهای موجود در این پوشه (<?= tr_num(count($categoryProducts)) ?> کالا)
                 </span>
                 <a href="categories.php" class="btn btn-sm btn-outline-secondary">
                     <i class="bi bi-arrow-right me-1"></i> بازگشت به لیست پوشه‌ها
                 </a>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">ردیف</th>
+                            <th>نام قطعه و شناسه</th>
+                            <th>برند</th>
+                            <th>قیمت خرید</th>
+                            <th>قیمت فروش</th>
+                            <th>موجودی</th>
+                            <th class="text-center" style="width: 110px;">عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($categoryProducts)): ?>
                             <tr>
-                                <th style="width: 60px;">ردیف</th>
-                                <th>نام قطعه و شناسه</th>
-                                <th>برند</th>
-                                <th>قیمت خرید</th>
-                                <th>قیمت فروش</th>
-                                <th>موجودی</th>
-                                <th class="text-center" style="width: 140px;">عملیات</th>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                                    هیچ محصولی در این پوشه ثبت نشده است.
+                                    <div class="mt-2">
+                                        <a href="product-add.php?category_id=<?= $activeCategory['id'] ?>" class="btn btn-sm btn-primary">
+                                            ثبت اولین کالا در این دسته
+                                        </a>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($categoryProducts)): ?>
+                        <?php else: ?>
+                            <?php $idx = 1; foreach ($categoryProducts as $p): ?>
                                 <tr>
-                                    <td colspan="7" class="text-center py-5 text-muted">
-                                        <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
-                                        هیچ محصولی در این پوشه ثبت نشده است.
-                                        <div class="mt-2">
-                                            <a href="product-add.php?category_id=<?= $activeCategory['id'] ?>" class="btn btn-sm btn-primary">
-                                                ثبت اولین کالا در این دسته
+                                    <td class="text-muted fw-bold"><?= tr_num($idx++) ?></td>
+                                    <td>
+                                        <div class="fw-bold fs-6"><?= htmlspecialchars($p['name']) ?></div>
+                                        <?php if (!empty($p['code'])): ?>
+                                            <span class="badge bg-light text-secondary border font-monospace mt-1"><?= htmlspecialchars($p['code']) ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary-subtle text-body border">
+                                            <?= htmlspecialchars($p['brand_name'] ?: 'متفرقه') ?>
+                                        </span>
+                                    </td>
+                                    <td class="price-buy">
+                                        <?= formatToman($p['purchase_price']) ?>
+                                    </td>
+                                    <td class="price-sell fw-bold">
+                                        <?= formatToman($p['sell_price']) ?>
+                                    </td>
+                                    <td>
+                                        <?php if ($p['stock'] <= 0): ?>
+                                            <span class="stock-pill stock-pill-empty">
+                                                <span class="stock-dot"></span>ناموجود (۰)
+                                            </span>
+                                        <?php elseif ($p['stock'] <= $p['min_stock']): ?>
+                                            <span class="stock-pill stock-pill-low">
+                                                <span class="stock-dot"></span><?= tr_num($p['stock']) ?> عدد (کمبود)
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="stock-pill stock-pill-high">
+                                                <span class="stock-dot"></span><?= tr_num($p['stock']) ?> عدد
+                                            </span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-inline-flex gap-1">
+                                            <a href="product-edit.php?id=<?= $p['id'] ?>" class="table-action-btn table-action-edit" title="ویرایش و تغییر قیمت">
+                                                <i class="bi bi-pencil-square"></i>
                                             </a>
+                                            <button type="button" class="table-action-btn table-action-delete" onclick="confirmDeleteProduct(<?= $p['id'] ?>, '<?= htmlspecialchars(addslashes($p['name'])) ?>')" title="انتقال به زباله‌دان">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
-                            <?php else: ?>
-                                <?php $idx = 1; foreach ($categoryProducts as $p): ?>
-                                    <tr>
-                                        <td class="text-muted fw-bold"><?= tr_num($idx++) ?></td>
-                                        <td>
-                                            <div class="fw-bold text-dark fs-6"><?= htmlspecialchars($p['name']) ?></div>
-                                            <?php if (!empty($p['code'])): ?>
-                                                <span class="badge bg-light text-secondary border font-monospace mt-1"><?= htmlspecialchars($p['code']) ?></span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-secondary-subtle text-dark border">
-                                                <?= htmlspecialchars($p['brand_name'] ?: 'متفرقه') ?>
-                                            </span>
-                                        </td>
-                                        <td class="price-buy">
-                                            <?= formatToman($p['purchase_price']) ?>
-                                        </td>
-                                        <td class="price-sell fw-bold">
-                                            <?= formatToman($p['sell_price']) ?>
-                                        </td>
-                                        <td>
-                                            <?php if ($p['stock'] <= 0): ?>
-                                                <span class="badge stock-badge-empty rounded-pill px-3 py-1">ناموجود (۰)</span>
-                                            <?php elseif ($p['stock'] <= $p['min_stock']): ?>
-                                                <span class="badge stock-badge-medium rounded-pill px-3 py-1"><?= tr_num($p['stock']) ?> عدد (کمبود موجودی)</span>
-                                            <?php else: ?>
-                                                <span class="badge stock-badge-high rounded-pill px-3 py-1"><?= tr_num($p['stock']) ?> عدد</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td class="text-center">
-                                            <div class="btn-group btn-group-sm">
-                                                <a href="product-edit.php?id=<?= $p['id'] ?>" class="btn btn-outline-primary" title="ویرایش و تغییر قیمت">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                </a>
-                                                <button type="button" class="btn btn-outline-danger" onclick="confirmDeleteProduct(<?= $p['id'] ?>, '<?= htmlspecialchars(addslashes($p['name'])) ?>')" title="انتقال به زباله‌دان">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

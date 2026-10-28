@@ -1,4 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+/* فونت محلی وزیرمتن بدون وابستگی به CDN */
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('../fonts/vazirmatn/Vazirmatn-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('../fonts/vazirmatn/Vazirmatn-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('../fonts/vazirmatn/Vazirmatn-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
 
 :root {
     --primary-color: #0284c7;
@@ -13,8 +36,8 @@
     --border-color: #e2e8f0;
     --border-focus: #38bdf8;
     --input-bg: #ffffff;
-    --table-hover: rgba(2, 132, 199, 0.03);
-    --badge-bg: #f1f5f9;
+    --table-hover: rgba(2, 132, 199, 0.04);
+    --badge-bg: #f8fafc;
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
     --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.09);
@@ -397,27 +420,127 @@ body {
     border-radius: 12px;
 }
 
-/* Tables */
+/* Professional SaaS Tables UI */
+.table-container {
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
 .table {
     color: var(--text-primary);
     vertical-align: middle;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 .table th {
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 0.88rem;
     color: var(--text-secondary);
-    background-color: var(--badge-bg);
-    border-bottom: 2px solid var(--border-color);
-    padding: 0.85rem 1rem;
+    background: var(--badge-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 1.1rem;
+    letter-spacing: -0.2px;
 }
 
 .table td {
-    padding: 0.85rem 1rem;
+    padding: 1rem 1.1rem;
     border-bottom: 1px solid var(--border-color);
+    font-size: 0.92rem;
+    transition: background-color 0.15s ease;
+}
+
+.table-hover tbody tr {
+    transition: all 0.15s ease;
 }
 
 .table-hover tbody tr:hover {
-    background-color: var(--table-hover);
+    background-color: var(--table-hover) !important;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Indicators and badges inside tables */
+.stock-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 50rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.stock-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.stock-pill-high {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+}
+.stock-pill-high .stock-dot {
+    background: #10b981;
+    box-shadow: 0 0 6px #10b981;
+}
+
+.stock-pill-low {
+    background: rgba(245, 158, 11, 0.14);
+    color: #d97706;
+}
+.stock-pill-low .stock-dot {
+    background: #f59e0b;
+    box-shadow: 0 0 6px #f59e0b;
+}
+
+.stock-pill-empty {
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+}
+.stock-pill-empty .stock-dot {
+    background: #ef4444;
+    box-shadow: 0 0 6px #ef4444;
+}
+
+/* Action button group inside tables */
+.table-action-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.18s ease;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+}
+
+.table-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.table-action-edit:hover {
+    border-color: #0284c7;
+    color: #0284c7;
+    background: rgba(2, 132, 199, 0.08);
+}
+
+.table-action-delete:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
 }
 
 /* Buttons */
@@ -583,7 +706,7 @@ body.theme-dark .swal2-html-container {
     width: 40px !important;
     height: 40px !important;
     min-width: 40px !important;
-    display: inline-flex !important;
+    display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     border-radius: 12px !important;
@@ -592,6 +715,14 @@ body.theme-dark .swal2-html-container {
     color: var(--text-secondary);
     transition: all 0.2s ease;
     cursor: pointer;
+    padding: 0 !important;
+}
+
+.theme-toggle-btn i {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
 }
 
 .theme-toggle-btn:hover {

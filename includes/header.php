@@ -33,12 +33,12 @@ $currentUsername = getSetting('admin_username', ADMIN_USERNAME);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($pageTitle) ? htmlspecialchars($pageTitle) . ' | ' : '' ?><?= APP_TITLE ?></title>
     
-    <!-- Bootstrap 5 RTL -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- SweetAlert2 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Local Bootstrap 5 RTL -->
+    <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.rtl.min.css">
+    <!-- Local Bootstrap Icons -->
+    <link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
+    <!-- Local SweetAlert2 -->
+    <link rel="stylesheet" href="assets/vendor/sweetalert2/sweetalert2.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time() ?>">
     <script>

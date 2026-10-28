@@ -49,8 +49,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install_db'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نصب و راه‌اندازی دیتابیس | <?= APP_NAME ?></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Bootstrap 5 RTL (Local) -->
+    <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.rtl.min.css">
+    <!-- Bootstrap Icons (Local) -->
+    <link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time() ?>">
     <style>
         body {

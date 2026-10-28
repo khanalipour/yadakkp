@@ -164,7 +164,7 @@ require_once __DIR__ . '/includes/header.php';
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
+                        <thead>
                             <tr>
                                 <th>نام قطعه</th>
                                 <th>دسته‌بندی</th>
@@ -182,7 +182,7 @@ require_once __DIR__ . '/includes/header.php';
                                 <?php foreach ($recentProducts as $p): ?>
                                     <tr>
                                         <td>
-                                            <div class="fw-bold text-dark"><?= htmlspecialchars($p['name']) ?></div>
+                                            <div class="fw-bold"><?= htmlspecialchars($p['name']) ?></div>
                                             <div class="d-flex align-items-center gap-2 mt-1">
                                                 <?php if (!empty($p['code'])): ?>
                                                     <span class="badge bg-light text-secondary border font-monospace"><?= htmlspecialchars($p['code']) ?></span>
@@ -200,19 +200,25 @@ require_once __DIR__ . '/includes/header.php';
                                         </td>
                                         <td>
                                             <?php if ($p['stock'] <= 0): ?>
-                                                <span class="badge stock-badge-empty rounded-pill px-2 py-1">ناموجود</span>
+                                                <span class="stock-pill stock-pill-empty">
+                                                    <span class="stock-dot"></span>ناموجود
+                                                </span>
                                             <?php elseif ($p['stock'] <= $p['min_stock']): ?>
-                                                <span class="badge stock-badge-medium rounded-pill px-2 py-1"><?= tr_num($p['stock']) ?> عدد</span>
+                                                <span class="stock-pill stock-pill-low">
+                                                    <span class="stock-dot"></span><?= tr_num($p['stock']) ?> عدد
+                                                </span>
                                             <?php else: ?>
-                                                <span class="badge stock-badge-high rounded-pill px-2 py-1"><?= tr_num($p['stock']) ?> عدد</span>
+                                                <span class="stock-pill stock-pill-high">
+                                                    <span class="stock-dot"></span><?= tr_num($p['stock']) ?> عدد
+                                                </span>
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-center">
-                                            <div class="btn-group btn-group-sm">
-                                                <a href="product-edit.php?id=<?= $p['id'] ?>" class="btn btn-outline-primary" title="ویرایش و افزایش قیمت">
+                                            <div class="d-inline-flex gap-1">
+                                                <a href="product-edit.php?id=<?= $p['id'] ?>" class="table-action-btn table-action-edit" title="ویرایش و افزایش قیمت">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
-                                                <button type="button" class="btn btn-outline-danger" onclick="confirmDeleteProduct(<?= $p['id'] ?>, '<?= htmlspecialchars(addslashes($p['name'])) ?>')" title="انتقال به سطل زباله">
+                                                <button type="button" class="table-action-btn table-action-delete" onclick="confirmDeleteProduct(<?= $p['id'] ?>, '<?= htmlspecialchars(addslashes($p['name'])) ?>')" title="انتقال به سطل زباله">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </div>
