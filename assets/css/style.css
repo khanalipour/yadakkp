@@ -425,7 +425,97 @@ body.theme-dark .swal2-html-container {
     font-size: 0.9rem;
 }
 
-.dropdown-item:hover {
-    background-color: var(--table-hover);
-    color: var(--primary-color);
+/* Mobile Typography & Single-Line Tables (جلوگیری از دوخطی شدن) */
+@media (max-width: 767.98px) {
+    html, body {
+        font-size: 13.5px !important;
+    }
+    
+    h1, .h1 { font-size: 1.4rem !important; }
+    h2, .h2 { font-size: 1.25rem !important; }
+    h3, .h3 { font-size: 1.15rem !important; }
+    h4, .h4 { font-size: 1.02rem !important; }
+    h5, .h5 { font-size: 0.92rem !important; }
+    h6, .h6 { font-size: 0.85rem !important; }
+
+    .btn {
+        padding: 0.45rem 0.85rem !important;
+        font-size: 0.85rem !important;
+    }
+
+    .form-control, .form-select {
+        font-size: 0.86rem !important;
+        padding: 0.48rem 0.75rem !important;
+    }
+
+    /* جلوگیری از دو خطی شدن آیتم‌های جداول در حالت موبایل */
+    .table-responsive {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table th,
+    .table td {
+        white-space: nowrap !important;
+        font-size: 0.84rem !important;
+        padding: 0.65rem 0.75rem !important;
+    }
+
+    .table td * {
+        white-space: nowrap !important;
+    }
+
+    .table td .badge {
+        font-size: 0.75rem !important;
+        padding: 0.25em 0.55em !important;
+        white-space: nowrap !important;
+    }
+
+    .stat-card .card-body {
+        padding: 0.95rem !important;
+    }
+
+    .stat-icon {
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 1.25rem !important;
+    }
+
+    /* هدر موبایل هماهنگ در ارتفاع */
+    .custom-header .navbar-brand img {
+        max-height: 38px !important;
+    }
 }
+
+/* هماهنگی ارتفاع آیکون‌ها و دکمه‌های هدر */
+.header-action-btn {
+    height: 40px !important;
+    min-width: 40px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    padding: 0 0.85rem !important;
+}
+
+.theme-toggle-btn {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.theme-toggle-btn:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: rotate(15deg);
+}
+

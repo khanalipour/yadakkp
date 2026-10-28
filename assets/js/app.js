@@ -3,26 +3,14 @@
  * Dark Mode, SweetAlert2 Popups, Price Calculator, Mobile Filters
  */
 
-// ۱. مدیریت پوسته تاریک و روشن (Dark Mode) همراه با تعویض لوگو
-function initTheme() {
-    const savedTheme = localStorage.getItem('yadakkp_theme') || 'light';
-    applyTheme(savedTheme, false);
-
-    const toggleBtn = document.getElementById('themeToggleBtn');
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', function () {
-            const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            applyTheme(newTheme, true);
-        });
-    }
-}
-
+// ۱. توابع سراسری پوسته شب و روز (Dark Mode)
 function applyTheme(theme, save = true) {
     document.documentElement.setAttribute('data-bs-theme', theme);
     if (theme === 'dark') {
+        document.documentElement.classList.add('theme-dark');
         document.body.classList.add('theme-dark');
     } else {
+        document.documentElement.classList.remove('theme-dark');
         document.body.classList.remove('theme-dark');
     }
 
@@ -40,14 +28,34 @@ function applyTheme(theme, save = true) {
     const toggleIcon = document.getElementById('themeToggleIcon');
     if (toggleIcon) {
         if (theme === 'dark') {
-            toggleIcon.className = 'bi bi-sun-fill text-warning';
+            toggleIcon.className = 'bi bi-sun-fill text-warning fs-5';
         } else {
-            toggleIcon.className = 'bi bi-moon-stars text-secondary';
+            toggleIcon.className = 'bi bi-moon-stars text-secondary fs-5';
         }
     }
 
     if (save) {
         localStorage.setItem('yadakkp_theme', theme);
+    }
+}
+
+function toggleDarkMode() {
+    const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(newTheme, true);
+}
+
+// برای اطمینان از دسترسی سراسری در HTML
+window.toggleDarkMode = toggleDarkMode;
+window.applyTheme = applyTheme;
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('yadakkp_theme') || 'light';
+    applyTheme(savedTheme, false);
+
+    const toggleBtn = document.getElementById('themeToggleBtn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', toggleDarkMode);
     }
 }
 
@@ -78,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 html: flash.message,
                 confirmButtonText: 'متوجه شدم',
                 confirmButtonColor: '#0284c7',
-                timer: 4000,
+                timer: 4500,
                 timerProgressBar: true
             });
         }
@@ -206,6 +214,12 @@ function confirmTerminateSession(sessionId, deviceName) {
             }
         });
     } else {
+        if (confirm(`آیا از قطع دسترسی دستگاه "${deviceName}" اطمینان دارید؟`)) {
+            window.location.href = `devices.php?terminate=${sessionId}`;
+        }
+    }
+}
+
 /**
  * پاپ‌آپ تایید خاتمه دادن به تمامی سایر دستگاه‌ها
  */
@@ -234,4 +248,3 @@ function confirmTerminateOtherSessions() {
         }
     }
 }
-

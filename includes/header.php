@@ -67,16 +67,16 @@ $currentUsername = getSetting('admin_username', ADMIN_USERNAME);
             </div>
         </a>
 
-        <!-- دکمه‌های سمت چپ هدر (دارک مود، پروفایل و منوی مدرن موبایل) -->
+        <!-- دکمه‌های سمت چپ هدر (دارک مود، پروفایل و منوی مدرن موبایل - همگی با ارتفاع یکسان ۴۰ پیکسل) -->
         <div class="d-flex align-items-center gap-2 order-lg-3">
             <!-- سوئیچ دارک مود -->
-            <button type="button" class="theme-toggle-btn shadow-none" id="themeToggleBtn" title="تغییر حالت شب و روز">
+            <button type="button" class="theme-toggle-btn header-action-btn shadow-none" id="themeToggleBtn" onclick="toggleDarkMode()" title="تغییر حالت شب و روز">
                 <i class="bi bi-moon-stars" id="themeToggleIcon"></i>
             </button>
 
             <!-- منوی کاربری و تنظیمات -->
             <div class="dropdown">
-                <button class="btn btn-light border btn-sm dropdown-toggle d-flex align-items-center gap-2 rounded-3 px-3 py-2" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-light border header-action-btn dropdown-toggle d-flex align-items-center gap-2 shadow-none" type="button" data-bs-toggle="dropdown">
                     <i class="bi bi-person-circle fs-6 text-primary"></i>
                     <span class="d-none d-md-inline fw-semibold"><?= htmlspecialchars($_SESSION['auth_user'] ?? $currentUsername) ?></span>
                 </button>
@@ -104,9 +104,9 @@ $currentUsername = getSetting('admin_username', ADMIN_USERNAME);
                 </ul>
             </div>
 
-            <!-- دکمه منوی کشویی موبایل (Offcanvas Toggle) -->
-            <button class="btn btn-light border d-lg-none p-2 rounded-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
-                <i class="bi bi-list fs-4"></i>
+            <!-- دکمه منوی کشویی موبایل (Offcanvas Toggle) با ارتفاع یکسان ۴۰ پیکسل -->
+            <button class="btn btn-light border header-action-btn d-lg-none shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                <i class="bi bi-list fs-5"></i>
             </button>
         </div>
 
@@ -161,12 +161,15 @@ $currentUsername = getSetting('admin_username', ADMIN_USERNAME);
 
 <!-- منوی آف‌کانواس کشویی حرفه‌ای موبایل (Mobile Offcanvas Drawer) -->
 <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-    <div class="offcanvas-header border-bottom py-3">
+    <div class="offcanvas-header border-bottom py-3 d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
             <img src="assets/images/logo.png" alt="<?= APP_NAME ?>" height="36" class="app-logo-img">
             <span class="fw-bold fs-6">یدک کی پی</span>
         </div>
-        <button type="button" class="btn-close ms-0" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <!-- دکمه قرمز و خوش‌جای بستن منو -->
+        <button type="button" class="btn btn-danger btn-sm rounded-3 d-flex align-items-center justify-content-center p-0 shadow-sm" style="width: 34px; height: 34px; background-color: #ef4444 !important; border: none;" data-bs-dismiss="offcanvas" aria-label="بستن">
+            <i class="bi bi-x-lg text-white fs-6"></i>
+        </button>
     </div>
     <div class="offcanvas-body d-flex flex-column p-3">
         <div class="p-3 bg-light rounded-4 mb-3 d-flex align-items-center gap-3">
