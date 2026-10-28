@@ -113,4 +113,14 @@ CREATE TABLE `active_sessions` (
   KEY `idx_expires` (`expires_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
 
+-- --------------------------------------------------------
+-- جدول تنظیمات سیستم (نام کاربری و کلمه عبور)
+-- --------------------------------------------------------
+DROP TABLE IF EXISTS `settings`;
+CREATE TABLE `settings` (
+  `key` varchar(100) NOT NULL,
+  `value` text NOT NULL,
+  PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;

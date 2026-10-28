@@ -123,27 +123,68 @@ require_once __DIR__ . '/includes/header.php';
             <i class="bi bi-boxes text-primary me-2"></i>لیست تمام کالاهای موجود در انبار
         </h3>
         <p class="text-muted small mb-0">
-            جستجو، فیلتر پیشرفته، مدیریت قیمت و ویرایش کلیه قطعات یدکی ثبت شده در سیستم.
+            جستجو، فیلتر پیشرفته، مدیریت قیمت و خروجی یا ورود گروهی فایل قطعات یدکی.
         </p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex flex-wrap gap-2">
+        <!-- دکمه خروجی اکسل / JSON -->
+        <div class="dropdown">
+            <button class="btn btn-outline-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-file-earmark-arrow-down me-1"></i> خروجی فایل
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                <li>
+                    <a class="dropdown-item py-2" href="export.php?format=csv&category_id=<?= $categoryId ?>">
+                        <i class="bi bi-file-earmark-excel text-success me-2"></i>دانلود فایل اکسل (CSV)
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item py-2" href="export.php?format=json&category_id=<?= $categoryId ?>">
+                        <i class="bi bi-filetype-json text-primary me-2"></i>دانلود ساختار JSON
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item py-2 text-muted small" href="export.php?template=1&format=csv">
+                        <i class="bi bi-cloud-arrow-down me-2"></i>دانلود قالب خام اکسل
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- دکمه ورود کالاها از فایل -->
+        <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#importModal">
+            <i class="bi bi-file-earmark-arrow-up me-1"></i> ورود از فایل
+        </button>
+
         <a href="product-add.php" class="btn btn-primary shadow-sm">
             <i class="bi bi-plus-circle me-1"></i> ثبت محصول جدید
         </a>
     </div>
 </div>
 
+<!-- دکمه باز و بسته کردن فیلتر در حالت موبایل -->
+<div class="d-md-none mb-3">
+    <button class="btn btn-outline-primary w-100 py-2 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+        <span><i class="bi bi-funnel-fill me-2"></i>منوی فیلتر و جستجوی پیشرفته</span>
+        <span class="badge bg-primary rounded-pill">
+            <?= (!empty($search) || $categoryId > 0 || $brandId > 0 || $minPrice > 0 || $maxPrice > 0 || $stockStatus !== 'all') ? 'فیلتر فعال' : 'نمایش' ?>
+        </span>
+    </button>
+</div>
+
 <!-- بخش فیلتر پیشرفته (Advanced Filters Card) -->
-<div class="card shadow-sm border-0 mb-4">
-    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-        <span class="fw-bold text-dark"><i class="bi bi-funnel-fill text-primary me-2"></i>فیلترهای پیشرفته و جستجو</span>
-        <?php if (!empty($search) || $categoryId > 0 || $brandId > 0 || $minPrice > 0 || $maxPrice > 0 || $stockStatus !== 'all' || $sortBy !== 'newest'): ?>
-            <a href="products.php" class="btn btn-outline-danger btn-sm">
-                <i class="bi bi-x-circle me-1"></i> پاکسازی فیلترها
-            </a>
-        <?php endif; ?>
-    </div>
-    <div class="card-body p-4">
+<div class="collapse d-md-block <?= (!empty($search) || $categoryId > 0 || $brandId > 0 || $minPrice > 0 || $maxPrice > 0 || $stockStatus !== 'all') ? 'show' : '' ?>" id="filterCollapse">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-dark"><i class="bi bi-funnel-fill text-primary me-2"></i>فیلترهای پیشرفته و جستجو</span>
+            <?php if (!empty($search) || $categoryId > 0 || $brandId > 0 || $minPrice > 0 || $maxPrice > 0 || $stockStatus !== 'all' || $sortBy !== 'newest'): ?>
+                <a href="products.php" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-x-circle me-1"></i> پاکسازی فیلترها
+                </a>
+            <?php endif; ?>
+        </div>
+        <div class="card-body p-4">
         <form method="GET" action="products.php" id="filterForm">
             <div class="row g-3">
                 <!-- جستجوی متنی -->
@@ -227,6 +268,7 @@ require_once __DIR__ . '/includes/header.php';
         </form>
     </div>
 </div>
+</div><!-- /#filterCollapse -->
 
 <!-- نوار خلاصه آمار فیلتر -->
 <div class="d-flex flex-wrap justify-content-between align-items-center bg-light p-3 rounded-3 border mb-3 gap-2">
@@ -330,6 +372,52 @@ require_once __DIR__ . '/includes/header.php';
                     <?php endif; ?>
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- مدال ورود کالاها از فایل اکسل یا JSON -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form method="POST" action="import.php" enctype="multipart/form-data">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-file-earmark-arrow-up text-info me-2"></i>ورود کالاها از فایل (اکسل / JSON)
+                    </h5>
+                    <button type="button" class="btn-close ms-0" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="alert alert-info py-2 small mb-3">
+                        <i class="bi bi-info-circle me-1"></i>
+                        می‌توانید فایل‌های خروجی گرفته شده با فرمت <strong>CSV (اکسل)</strong> یا <strong>JSON</strong> را در اینجا بارگذاری نمایید.
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">انتخاب فایل اکسل (CSV) یا JSON <span class="text-danger">*</span></label>
+                        <input type="file" name="import_file" class="form-control" accept=".csv, .json" required>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 small">
+                        <div class="fw-bold mb-1 text-dark">نیاز به راهنمایی دارید؟</div>
+                        <div class="text-muted mb-2">جهت پر کردن صحیح ستون‌ها، فایل نمونه را دانلود کرده و مقادیر را مطابق آن تکمیل کنید:</div>
+                        <div class="d-flex gap-2">
+                            <a href="export.php?template=1&format=csv" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-download me-1"></i> دریافت نمونه اکسل
+                            </a>
+                            <a href="export.php?template=1&format=json" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-download me-1"></i> دریافت نمونه JSON
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">
+                        <i class="bi bi-upload me-1"></i> شروع ورود کالاها
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

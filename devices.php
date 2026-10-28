@@ -11,20 +11,28 @@ $currentSession = requireAuth();
 $db = getDB();
 $currentToken = $_COOKIE[SESSION_COOKIE_NAME] ?? $_SESSION['auth_token'] ?? '';
 
+// پاکسازی خودکار نشست‌های منقضی شده یا اسکریپت‌های تست فاقد مرورگر واقعی
+try {
+    if (getDBDriver() === 'mysql') {
+        $db->exec("DELETE FROM active_sessions WHERE expires_at <= NOW() OR user_agent = '' OR user_agent LIKE '%PowerShell%'");
+    } else {
+        $db->exec("DELETE FROM active_sessions WHERE expires_at <= datetime('now', 'localtime') OR user_agent = '' OR user_agent LIKE '%PowerShell%'");
+    }
+} catch (Exception $e) {}
+
 // عملیات خروج دستگاه مشخص
 if (isset($_GET['terminate'])) {
     $terminateId = (int)$_GET['terminate'];
     if ($terminateId > 0) {
-        // اگر دستگاه فعلی را قطع کند، خارج شود
         if ($terminateId === (int)$currentSession['id']) {
             terminateSessionById($terminateId);
             logoutUser();
-            setFlash('info', 'نشست این دستگاه خاتمه یافت.');
+            setFlash('info', 'نشست این دستگاه با موفقیت خاتمه یافت.');
             header('Location: login.php');
             exit;
         } else {
             terminateSessionById($terminateId);
-            setFlash('success', 'نشست دستگاه مورد نظر با موفقیت لغو و قطع گردید.');
+            setFlash('success', 'نشست دستگاه مورد نظر با موفقیت لغو و اتصال آن قطع گردید.');
             header('Location: devices.php');
             exit;
         }
@@ -47,18 +55,19 @@ require_once __DIR__ . '/includes/header.php';
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
         <h3 class="fw-bold mb-1">
-            <i class="bi bi-laptop text-primary me-2"></i>دستگاه‌ها و نشست‌های فعال
+            <i class="bi bi-laptop text-primary me-2"></i>دستگاه‌ها و نشست‌های فعال واقعی
         </h3>
         <p class="text-muted small mb-0">
-            لیست دستگاه‌ها و مرورگرهایی که هم‌اکنون به سیستم انبارداری یدک کی پی متصل هستند (اعتبار هر نشست: حداکثر ۲ روز).
+            فقط دستگاه‌ها و مرورگرهای واقعی متصل به سیستم با اعتبار ۲ روزه نمایش داده می‌شوند.
         </p>
     </div>
     <div>
         <?php if (count($sessions) > 1): ?>
-            <form method="POST" action="devices.php" onsubmit="return confirm('آیا مطمئن هستید که می‌خواهید اتصال همه دستگاه‌های دیگر قطع شود؟');" class="d-inline">
-                <button type="submit" name="terminate_others" class="btn btn-outline-danger btn-sm">
-                    <i class="bi bi-shield-x me-1"></i> خروج از تمامی دستگاه‌های دیگر
-                </button>
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmTerminateOtherSessions()">
+                <i class="bi bi-shield-x me-1"></i> خروج از تمامی دستگاه‌های دیگر
+            </button>
+            <form id="terminateOthersForm" method="POST" action="devices.php" class="d-none">
+                <input type="hidden" name="terminate_others" value="1">
             </form>
         <?php endif; ?>
     </div>

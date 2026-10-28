@@ -179,6 +179,25 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
 
                 <div class="d-flex flex-wrap align-items-center gap-2">
+                    <!-- دکمه خروجی اکسل و JSON این دسته -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-file-earmark-arrow-down me-1"></i> خروجی این دسته
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li>
+                                <a class="dropdown-item py-2" href="export.php?format=csv&category_id=<?= $activeCategory['id'] ?>">
+                                    <i class="bi bi-file-earmark-excel text-success me-2"></i>فایل اکسل (CSV) این دسته
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2" href="export.php?format=json&category_id=<?= $activeCategory['id'] ?>">
+                                    <i class="bi bi-filetype-json text-primary me-2"></i>فایل JSON این دسته
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
                     <!-- دکمه افزایش قیمت محصولات این دسته -->
                     <button type="button" class="btn btn-warning fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#bulkPriceModal">
                         <i class="bi bi-graph-up-arrow me-1"></i> افزایش قیمت محصولات این دسته
@@ -435,10 +454,10 @@ require_once __DIR__ . '/includes/header.php';
         </div>
     </div>
 
-    <div class="row g-4">
+    <div class="row g-2 g-md-4">
         <?php foreach ($categories as $cat): ?>
-            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                <div class="folder-card p-4 h-100 d-flex flex-column" onclick="window.location.href='categories.php?cat_id=<?= $cat['id'] ?>'">
+            <div class="col-6 col-md-4 col-xl-3">
+                <div class="folder-card p-3 p-md-4 h-100 d-flex flex-column" onclick="window.location.href='categories.php?cat_id=<?= $cat['id'] ?>'">
                     <div class="folder-tab" style="background-color: <?= htmlspecialchars($cat['color']) ?>;"></div>
                     
                     <div class="folder-icon-wrapper" style="background-color: <?= htmlspecialchars($cat['color']) ?>15; color: <?= htmlspecialchars($cat['color']) ?>;">

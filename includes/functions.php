@@ -43,43 +43,69 @@ function getClientIp() {
 }
 
 /**
- * تشخیص نام دستگاه و مرورگر از User-Agent
+ * تشخیص نام دستگاه و مرورگر از User-Agent با دقت بالا
  */
 function parseUserAgent($userAgent = null) {
     if ($userAgent === null) {
         $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
     }
 
-    $platform = 'دستگاه نامشخص';
-    $browser = 'مرورگر نامشخص';
+    if (empty($userAgent)) {
+        return 'دستگاه محلی (مستقیم)';
+    }
 
-    // تشخیص سیستم عامل
-    if (preg_match('/windows|win32/i', $userAgent)) {
-        $platform = 'ویندوز (Windows)';
+    $platform = 'کامپیوتر / لپ‌تاپ';
+    $deviceType = '';
+
+    // تشخیص سیستم عامل و نوع دستگاه
+    if (preg_match('/iphone/i', $userAgent)) {
+        $platform = 'گوشی اپل (iPhone)';
+        $deviceType = 'موبایل';
+    } elseif (preg_match('/ipad/i', $userAgent)) {
+        $platform = 'تبلت اپل (iPad)';
+        $deviceType = 'تبلت';
     } elseif (preg_match('/android/i', $userAgent)) {
-        $platform = 'اندروید (Android)';
-    } elseif (preg_match('/iphone|ipad|ipod/i', $userAgent)) {
-        $platform = 'آیفون / آیپد (iOS)';
+        if (preg_match('/mobile/i', $userAgent)) {
+            $platform = 'گوشی اندروید (Android)';
+            $deviceType = 'موبایل';
+        } else {
+            $platform = 'تبلت اندروید (Android Tab)';
+            $deviceType = 'تبلت';
+        }
+    } elseif (preg_match('/windows nt 10/i', $userAgent)) {
+        $platform = 'ویندوز (Windows 10/11)';
+        $deviceType = 'رایانه';
+    } elseif (preg_match('/windows nt 6\.3/i', $userAgent) || preg_match('/windows nt 6\.2/i', $userAgent)) {
+        $platform = 'ویندوز (Windows 8)';
+        $deviceType = 'رایانه';
+    } elseif (preg_match('/windows nt 6\.1/i', $userAgent)) {
+        $platform = 'ویندوز (Windows 7)';
+        $deviceType = 'رایانه';
     } elseif (preg_match('/macintosh|mac os x/i', $userAgent)) {
-        $platform = 'مک (macOS)';
+        $platform = 'مک‌بوک (macOS)';
+        $deviceType = 'رایانه';
     } elseif (preg_match('/linux/i', $userAgent)) {
         $platform = 'لینوکس (Linux)';
+        $deviceType = 'رایانه';
     }
 
     // تشخیص مرورگر
-    if (preg_match('/edg/i', $userAgent)) {
-        $browser = 'مایکروسافت اج (Edge)';
-    } elseif (preg_match('/chrome|crios/i', $userAgent)) {
-        $browser = 'گوگل کروم (Chrome)';
-    } elseif (preg_match('/firefox|fxios/i', $userAgent)) {
-        $browser = 'فایرفاکس (Firefox)';
-    } elseif (preg_match('/safari/i', $userAgent)) {
-        $browser = 'سافاری (Safari)';
-    } elseif (preg_match('/opera|opr/i', $userAgent)) {
+    $browser = 'مرورگر وب';
+    if (preg_match('/edg\/([0-9\.]+)/i', $userAgent, $m)) {
+        $browser = 'مایکروسافت اج';
+    } elseif (preg_match('/opr\/([0-9\.]+)|opera/i', $userAgent, $m)) {
         $browser = 'اوپرا (Opera)';
+    } elseif (preg_match('/samsungbrowser\/([0-9\.]+)/i', $userAgent, $m)) {
+        $browser = 'مرورگر سامسونگ';
+    } elseif (preg_match('/chrome\/([0-9]+)/i', $userAgent, $m)) {
+        $browser = 'گوگل کروم (نسخه ' . tr_num($m[1]) . ')';
+    } elseif (preg_match('/firefox\/([0-9]+)/i', $userAgent, $m)) {
+        $browser = 'فایرفاکس (نسخه ' . tr_num($m[1]) . ')';
+    } elseif (preg_match('/version\/([0-9]+).*safari/i', $userAgent, $m)) {
+        $browser = 'سافاری اپل (نسخه ' . tr_num($m[1]) . ')';
     }
 
-    return "{$platform} - {$browser}";
+    return "{$platform} • {$browser}";
 }
 
 /**
@@ -144,3 +170,38 @@ function timeElapsedString($datetime) {
     }
     return 'لحظاتی پیش';
 }
+
+/**
+ * دریافت یک مقدار از جدول تنظیمات
+ */
+function getSetting($key, $default = null) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT value FROM settings WHERE key = ?");
+        $stmt->execute([$key]);
+        $row = $stmt->fetch();
+        return $row ? $row['value'] : $default;
+    } catch (Exception $e) {
+        return $default;
+    }
+}
+
+/**
+ * ذخیره یا به‌روزرسانی مقدار در جدول تنظیمات
+ */
+function setSetting($key, $value) {
+    try {
+        $db = getDB();
+        $driver = getDBDriver();
+        if ($driver === 'mysql') {
+            $stmt = $db->prepare("INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?");
+            return $stmt->execute([$key, $value, $value]);
+        } else {
+            $stmt = $db->prepare("INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = ?");
+            return $stmt->execute([$key, $value, $value]);
+        }
+    } catch (Exception $e) {
+        return false;
+    }
+}
+

@@ -141,6 +141,13 @@ function initDatabaseTables(PDO $db, string $driver) {
                 INDEX (`expires_at`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
         ");
+
+        $db->exec("
+            CREATE TABLE IF NOT EXISTS `settings` (
+                `key` VARCHAR(100) PRIMARY KEY,
+                `value` TEXT NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
+        ");
     } else {
         // ساخت جداول برای SQLite
         $db->exec("
@@ -193,6 +200,13 @@ function initDatabaseTables(PDO $db, string $driver) {
                 `login_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
                 `last_activity` DATETIME DEFAULT CURRENT_TIMESTAMP,
                 `expires_at` DATETIME NOT NULL
+            );
+        ");
+
+        $db->exec("
+            CREATE TABLE IF NOT EXISTS `settings` (
+                `key` TEXT PRIMARY KEY,
+                `value` TEXT NOT NULL
             );
         ");
     }

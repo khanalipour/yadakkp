@@ -79,10 +79,13 @@ function requireAuth() {
 }
 
 /**
- * عملیات ورود با بررسی نام کاربری و رمز عبور ثابت و ثبت دستگاه در دیتابیس
+ * عملیات ورود با بررسی نام کاربری و رمز عبور (پشتیبانی از تنظیمات تغییر یافته توسط کاربر)
  */
 function loginUser($username, $password) {
-    if ($username !== ADMIN_USERNAME || $password !== ADMIN_PASSWORD) {
+    $validUsername = getSetting('admin_username', ADMIN_USERNAME);
+    $validPassword = getSetting('admin_password', ADMIN_PASSWORD);
+
+    if ($username !== $validUsername || $password !== $validPassword) {
         return false;
     }
 
@@ -146,10 +149,20 @@ function terminateCurrentAuth() {
 }
 
 /**
- * دریافت لیست تمامی دستگاه‌های فعال متصل به سیستم
+ * دریافت لیست تمامی دستگاه‌های فعال واقعی متصل به سیستم
  */
 function getActiveSessions() {
     $db = getDB();
+    
+    // پاکسازی نشست‌های منقضی شده
+    try {
+        if (getDBDriver() === 'mysql') {
+            $db->exec("DELETE FROM active_sessions WHERE expires_at <= NOW()");
+        } else {
+            $db->exec("DELETE FROM active_sessions WHERE expires_at <= datetime('now', 'localtime')");
+        }
+    } catch (Exception $e) {}
+
     $query = "SELECT * FROM active_sessions WHERE expires_at > datetime('now', 'localtime') ORDER BY last_activity DESC";
     if (getDBDriver() === 'mysql') {
         $query = "SELECT * FROM active_sessions WHERE expires_at > NOW() ORDER BY last_activity DESC";

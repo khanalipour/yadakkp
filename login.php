@@ -108,10 +108,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <i class="bi bi-box-arrow-in-left me-1"></i> ورود به پنل انبارداری
         </button>
     </form>
-
-    <div class="mt-4 pt-3 border-top text-muted" style="font-size: 0.8rem;">
-        اطلاعات ورود پیش‌فرض: <code class="text-primary">admin</code> / <code class="text-primary">admin123</code>
-    </div>
 </div>
 
 </body>
