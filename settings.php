@@ -28,8 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             setFlash('danger', 'کلمه عبور فعلی وارد شده نادرست است.');
         } else {
             // به‌روزرسانی نام کاربری
-            setSetting('admin_username', $newUsername);
+            $uOk = setSetting('admin_username', $newUsername);
             $_SESSION['auth_user'] = $newUsername;
+
+            try {
+                $upSession = $db->prepare("UPDATE `active_sessions` SET `username` = ? WHERE `session_token` = ?");
+                $upSession->execute([$newUsername, $_SESSION['auth_token'] ?? '']);
+            } catch (Exception $e) {}
 
             // به‌روزرسانی رمز در صورت وارد شدن رمز جدید
             if (!empty($newPassword)) {
@@ -38,13 +43,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } elseif ($newPassword !== $confirmPassword) {
                     setFlash('danger', 'کلمه عبور جدید با تکرار آن مطابقت ندارد.');
                 } else {
-                    setSetting('admin_password', $newPassword);
-                    setFlash('success', 'نام کاربری و کلمه عبور جدید با موفقیت ذخیره شدند.');
+                    $pOk = setSetting('admin_password', $newPassword);
+                    if ($pOk) {
+                        setFlash('success', 'نام کاربری و کلمه عبور جدید با موفقیت ذخیره شدند.');
+                    } else {
+                        setFlash('danger', 'خطا در ذخیره‌سازی رمز عبور جدید در پایگاه داده.');
+                    }
                     header('Location: settings.php');
                     exit;
                 }
             } else {
-                setFlash('success', 'نام کاربری با موفقیت به‌روزرسانی شد.');
+                if ($uOk) {
+                    setFlash('success', 'نام کاربری با موفقیت به‌روزرسانی شد.');
+                } else {
+                    setFlash('danger', 'خطا در ذخیره‌سازی نام کاربری در پایگاه داده.');
+                }
                 header('Location: settings.php');
                 exit;
             }

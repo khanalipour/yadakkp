@@ -177,10 +177,10 @@ function timeElapsedString($datetime) {
 function getSetting($key, $default = null) {
     try {
         $db = getDB();
-        $stmt = $db->prepare("SELECT value FROM settings WHERE key = ?");
+        $stmt = $db->prepare("SELECT `value` FROM `settings` WHERE `key` = ?");
         $stmt->execute([$key]);
         $row = $stmt->fetch();
-        return $row ? $row['value'] : $default;
+        return ($row && isset($row['value'])) ? $row['value'] : $default;
     } catch (Exception $e) {
         return $default;
     }
@@ -194,10 +194,10 @@ function setSetting($key, $value) {
         $db = getDB();
         $driver = getDBDriver();
         if ($driver === 'mysql') {
-            $stmt = $db->prepare("INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?");
+            $stmt = $db->prepare("INSERT INTO `settings` (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?");
             return $stmt->execute([$key, $value, $value]);
         } else {
-            $stmt = $db->prepare("INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = ?");
+            $stmt = $db->prepare("INSERT INTO `settings` (`key`, `value`) VALUES (?, ?) ON CONFLICT(`key`) DO UPDATE SET `value` = ?");
             return $stmt->execute([$key, $value, $value]);
         }
     } catch (Exception $e) {
