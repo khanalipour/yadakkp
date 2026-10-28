@@ -42,14 +42,58 @@ $currentUsername = getSetting('admin_username', ADMIN_USERNAME);
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css?v=<?= time() ?>">
     <script>
-        // اعمال فوری پوسته ذخیره شده پیش از لود صفحه جهت جلوگیری از پرش نور
-        (function() {
-            var theme = localStorage.getItem('yadakkp_theme') || 'light';
+        function applyTheme(theme, save) {
+            if (save === undefined) save = true;
             document.documentElement.setAttribute('data-bs-theme', theme);
             if (theme === 'dark') {
                 document.documentElement.classList.add('theme-dark');
+                if (document.body) document.body.classList.add('theme-dark');
+            } else {
+                document.documentElement.classList.remove('theme-dark');
+                if (document.body) document.body.classList.remove('theme-dark');
+            }
+
+            // تعویض لوگوها در حالت شب و روز
+            var logos = document.querySelectorAll('.app-logo-img');
+            logos.forEach(function(img) {
+                img.src = (theme === 'dark') ? 'assets/images/logo-dark.png' : 'assets/images/logo.png';
+            });
+
+            // تعویض آیکون دکمه
+            var icon = document.getElementById('themeToggleIcon');
+            if (icon) {
+                icon.className = (theme === 'dark') ? 'bi bi-sun-fill text-warning fs-5' : 'bi bi-moon-stars text-secondary fs-5';
+            }
+
+            if (save) {
+                try { localStorage.setItem('yadakkp_theme', theme); } catch(e){}
+            }
+        }
+
+        function toggleDarkMode() {
+            var current = document.documentElement.getAttribute('data-bs-theme') || 'light';
+            var next = (current === 'dark') ? 'light' : 'dark';
+            applyTheme(next, true);
+        }
+
+        window.toggleDarkMode = toggleDarkMode;
+        window.applyTheme = applyTheme;
+
+        // مقداردهی اولیه سریع قبل از رندر
+        (function() {
+            var saved = 'light';
+            try { saved = localStorage.getItem('yadakkp_theme') || 'light'; } catch(e){}
+            document.documentElement.setAttribute('data-bs-theme', saved);
+            if (saved === 'dark') {
+                document.documentElement.classList.add('theme-dark');
             }
         })();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var saved = 'light';
+            try { saved = localStorage.getItem('yadakkp_theme') || 'light'; } catch(e){}
+            applyTheme(saved, false);
+        });
     </script>
 </head>
 <body>
