@@ -23,25 +23,17 @@ function checkAuth() {
     }
 
     $db = getDB();
+    $now = date('Y-m-d H:i:s');
 
     // پاکسازی توکن‌های منقضی شده عمومی
-    $cleanStmt = $db->prepare("DELETE FROM active_sessions WHERE expires_at <= datetime('now', 'localtime')");
-    // برای مای‌اس‌کیوال
-    if (getDBDriver() === 'mysql') {
-        $cleanStmt = $db->prepare("DELETE FROM active_sessions WHERE expires_at <= NOW()");
-    }
     try {
-        $cleanStmt->execute();
+        $cleanStmt = $db->prepare("DELETE FROM active_sessions WHERE expires_at <= ?");
+        $cleanStmt->execute([$now]);
     } catch (Exception $e) {}
 
     // جستجوی نشست فعال
-    $query = "SELECT * FROM active_sessions WHERE session_token = ? AND expires_at > datetime('now', 'localtime')";
-    if (getDBDriver() === 'mysql') {
-        $query = "SELECT * FROM active_sessions WHERE session_token = ? AND expires_at > NOW()";
-    }
-
-    $stmt = $db->prepare($query);
-    $stmt->execute([$token]);
+    $stmt = $db->prepare("SELECT * FROM active_sessions WHERE session_token = ? AND expires_at > ?");
+    $stmt->execute([$token, $now]);
     $session = $stmt->fetch();
 
     if (!$session) {
@@ -51,12 +43,8 @@ function checkAuth() {
     }
 
     // به‌روزرسانی زمان آخرین فعالیت
-    $updateQuery = "UPDATE active_sessions SET last_activity = datetime('now', 'localtime') WHERE id = ?";
-    if (getDBDriver() === 'mysql') {
-        $updateQuery = "UPDATE active_sessions SET last_activity = NOW() WHERE id = ?";
-    }
-    $upStmt = $db->prepare($updateQuery);
-    $upStmt->execute([$session['id']]);
+    $upStmt = $db->prepare("UPDATE active_sessions SET last_activity = ? WHERE id = ?");
+    $upStmt->execute([$now, $session['id']]);
 
     $_SESSION['auth_user'] = $session['username'];
     $_SESSION['auth_token'] = $session['session_token'];
@@ -153,21 +141,16 @@ function terminateCurrentAuth() {
  */
 function getActiveSessions() {
     $db = getDB();
+    $now = date('Y-m-d H:i:s');
     
     // پاکسازی نشست‌های منقضی شده
     try {
-        if (getDBDriver() === 'mysql') {
-            $db->exec("DELETE FROM active_sessions WHERE expires_at <= NOW()");
-        } else {
-            $db->exec("DELETE FROM active_sessions WHERE expires_at <= datetime('now', 'localtime')");
-        }
+        $stmtClean = $db->prepare("DELETE FROM active_sessions WHERE expires_at <= ?");
+        $stmtClean->execute([$now]);
     } catch (Exception $e) {}
 
-    $query = "SELECT * FROM active_sessions WHERE expires_at > datetime('now', 'localtime') ORDER BY last_activity DESC";
-    if (getDBDriver() === 'mysql') {
-        $query = "SELECT * FROM active_sessions WHERE expires_at > NOW() ORDER BY last_activity DESC";
-    }
-    $stmt = $db->query($query);
+    $stmt = $db->prepare("SELECT * FROM active_sessions WHERE expires_at > ? ORDER BY last_activity DESC");
+    $stmt->execute([$now]);
     return $stmt->fetchAll();
 }
 

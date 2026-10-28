@@ -13,11 +13,9 @@ $currentToken = $_COOKIE[SESSION_COOKIE_NAME] ?? $_SESSION['auth_token'] ?? '';
 
 // پاکسازی خودکار نشست‌های منقضی شده یا اسکریپت‌های تست فاقد مرورگر واقعی
 try {
-    if (getDBDriver() === 'mysql') {
-        $db->exec("DELETE FROM active_sessions WHERE expires_at <= NOW() OR user_agent = '' OR user_agent LIKE '%PowerShell%'");
-    } else {
-        $db->exec("DELETE FROM active_sessions WHERE expires_at <= datetime('now', 'localtime') OR user_agent = '' OR user_agent LIKE '%PowerShell%'");
-    }
+    $now = date('Y-m-d H:i:s');
+    $stmtClean = $db->prepare("DELETE FROM active_sessions WHERE expires_at <= ? OR user_agent = '' OR user_agent LIKE '%PowerShell%'");
+    $stmtClean->execute([$now]);
 } catch (Exception $e) {}
 
 // عملیات خروج دستگاه مشخص

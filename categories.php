@@ -79,8 +79,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_price_increase']
         $stmt->execute([$catId]);
         $prods = $stmt->fetchAll();
 
+        $now = date('Y-m-d H:i:s');
         $updateCount = 0;
-        $upStmt = $db->prepare("UPDATE products SET purchase_price = ?, sell_price = ?, updated_at = " . (getDBDriver() === 'mysql' ? "NOW()" : "datetime('now', 'localtime')") . " WHERE id = ?");
+        $upStmt = $db->prepare("UPDATE products SET purchase_price = ?, sell_price = ?, updated_at = ? WHERE id = ?");
 
         foreach ($prods as $p) {
             $newBuy = (int)$p['purchase_price'];
@@ -104,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_price_increase']
                 }
             }
 
-            $upStmt->execute([$newBuy, $newSell, $p['id']]);
+            $upStmt->execute([$newBuy, $newSell, $now, $p['id']]);
             $updateCount++;
         }
 

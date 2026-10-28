@@ -17,7 +17,9 @@ try {
     $tStmt = $db->query("SELECT COUNT(*) as cnt FROM products WHERE is_deleted = 1");
     $trashCount = (int)$tStmt->fetch()['cnt'];
 
-    $sStmt = $db->query("SELECT COUNT(*) as cnt FROM active_sessions WHERE expires_at > " . (getDBDriver() === 'mysql' ? "NOW()" : "datetime('now', 'localtime')"));
+    $now = date('Y-m-d H:i:s');
+    $sStmt = $db->prepare("SELECT COUNT(*) as cnt FROM active_sessions WHERE expires_at > ?");
+    $sStmt->execute([$now]);
     $activeSessionsCount = (int)$sStmt->fetch()['cnt'];
 } catch (Exception $e) {}
 

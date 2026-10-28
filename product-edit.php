@@ -77,13 +77,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
+        $now = date('Y-m-d H:i:s');
         $sql = "UPDATE products SET 
                 name = ?, code = ?, category_id = ?, brand_id = ?, 
                 purchase_price = ?, sell_price = ?, stock = ?, min_stock = ?, description = ?, 
-                updated_at = " . (getDBDriver() === 'mysql' ? "NOW()" : "datetime('now', 'localtime')") . " 
+                updated_at = ? 
                 WHERE id = ?";
         $stmt = $db->prepare($sql);
-        $stmt->execute([$name, $code, $categoryId, $brandId, $purchasePrice, $sellPrice, $stock, $minStock, $description, $id]);
+        $stmt->execute([$name, $code, $categoryId, $brandId, $purchasePrice, $sellPrice, $stock, $minStock, $description, $now, $id]);
 
         setFlash('success', "مشخصات کالای «{$name}» با موفقیت به‌روزرسانی شد.");
         header("Location: products.php");

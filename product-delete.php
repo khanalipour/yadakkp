@@ -20,9 +20,9 @@ if ($id > 0) {
 
     if ($action === 'trash') {
         // انتقال به سطل زباله (Soft Delete)
-        $nowSql = (getDBDriver() === 'mysql') ? "NOW()" : "datetime('now', 'localtime')";
-        $delStmt = $db->prepare("UPDATE products SET is_deleted = 1, deleted_at = {$nowSql} WHERE id = ?");
-        $delStmt->execute([$id]);
+        $now = date('Y-m-d H:i:s');
+        $delStmt = $db->prepare("UPDATE products SET is_deleted = 1, deleted_at = ? WHERE id = ?");
+        $delStmt->execute([$now, $id]);
         setFlash('warning', "کالای «{$name}» به سطل زباله منتقل شد.");
     } elseif ($action === 'restore') {
         // بازیابی از سطل زباله
