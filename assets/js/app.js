@@ -52,11 +52,6 @@ window.applyTheme = applyTheme;
 function initTheme() {
     const savedTheme = localStorage.getItem('yadakkp_theme') || 'light';
     applyTheme(savedTheme, false);
-
-    const toggleBtn = document.getElementById('themeToggleBtn');
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', toggleDarkMode);
-    }
 }
 
 document.addEventListener('DOMContentLoaded', function () {

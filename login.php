@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="rtl" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -51,23 +51,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             justify-content: center;
             min-height: 100vh;
             padding: 1.5rem;
+            position: relative;
         }
         .login-box {
             width: 100%;
             max-width: 440px;
-            background: #ffffff;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             border-radius: 20px;
             padding: 2.5rem 2rem;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+            position: relative;
         }
     </style>
+    <script>
+        function applyTheme(theme, save) {
+            if (save === undefined) save = true;
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            if (theme === 'dark') {
+                document.documentElement.classList.add('theme-dark');
+                if (document.body) document.body.classList.add('theme-dark');
+            } else {
+                document.documentElement.classList.remove('theme-dark');
+                if (document.body) document.body.classList.remove('theme-dark');
+            }
+
+            // تعویض لوگو
+            var logos = document.querySelectorAll('.app-logo-img');
+            logos.forEach(function(img) {
+                img.src = (theme === 'dark') ? 'assets/images/logo-dark.png' : 'assets/images/logo.png';
+            });
+
+            // تعویض آیکون
+            var icon = document.getElementById('themeToggleIcon');
+            if (icon) {
+                icon.className = (theme === 'dark') ? 'bi bi-sun-fill text-warning fs-5' : 'bi bi-moon-stars text-secondary fs-5';
+            }
+
+            if (save) {
+                try { localStorage.setItem('yadakkp_theme', theme); } catch(e){}
+            }
+        }
+
+        function toggleDarkMode() {
+            var current = document.documentElement.getAttribute('data-bs-theme') || 'light';
+            var next = (current === 'dark') ? 'light' : 'dark';
+            applyTheme(next, true);
+        }
+
+        window.toggleDarkMode = toggleDarkMode;
+
+        // مقداردهی اولیه سریع قبل از رندر
+        (function() {
+            var saved = 'light';
+            try { saved = localStorage.getItem('yadakkp_theme') || 'light'; } catch(e){}
+            document.documentElement.setAttribute('data-bs-theme', saved);
+            if (saved === 'dark') {
+                document.documentElement.classList.add('theme-dark');
+            }
+        })();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var saved = 'light';
+            try { saved = localStorage.getItem('yadakkp_theme') || 'light'; } catch(e){}
+            applyTheme(saved, false);
+        });
+    </script>
 </head>
 <body>
 
 <div class="login-box text-center">
+    <!-- دکمه دارک مود در صفحه لاگین -->
+    <div class="position-absolute top-0 start-0 m-3">
+        <button type="button" class="theme-toggle-btn shadow-none" id="themeToggleBtn" onclick="toggleDarkMode()" title="تغییر حالت شب و روز">
+            <i class="bi bi-moon-stars" id="themeToggleIcon"></i>
+        </button>
+    </div>
+
     <!-- Logo -->
-    <div class="mb-4">
-        <img src="assets/images/logo.png" alt="<?= APP_NAME ?>" class="img-fluid" style="max-height: 70px;">
+    <div class="mb-4 mt-2">
+        <img src="assets/images/logo.png" alt="<?= APP_NAME ?>" class="app-logo-img img-fluid" style="max-height: 70px;">
     </div>
     
     <h4 class="fw-bold text-dark mb-1">سیستم انبارداری یدک کی پی</h4>
